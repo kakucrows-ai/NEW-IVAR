@@ -8,7 +8,7 @@ module.exports = {
   aliases: ["lname", "namelock"],
   description: "قفل اسم المجموعة ومنع أي شخص من تغييره.",
   usage: "lockname [اسم اختياري]  |  lockname off",
-  category: "Admin",
+  category: "إدارة",
   adminOnly: true,
   groupOnly: true,
 

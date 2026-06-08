@@ -28,7 +28,7 @@ module.exports = {
   aliases: ["na", "allnick"],
   description: "تغيير كنيات جميع أعضاء المجموعة دفعةً واحدة مع إمكانية القفل.",
   usage: USAGE,
-  category: "Group",
+  category: "إدارة",
   groupOnly: true,
   adminOnly: true,
 

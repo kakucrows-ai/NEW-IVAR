@@ -5,9 +5,9 @@ const config = require("../config.json");
 module.exports = {
   name: "rename",
   aliases: ["setname", "groupname"],
-  description: "Rename the group chat. (Admin only)",
+  description: "تغيير اسم المجموعة.",
   usage: "rename <new name>",
-  category: "Group",
+  category: "إدارة",
   groupOnly: true,
   adminOnly: true,
 

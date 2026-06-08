@@ -210,7 +210,7 @@ module.exports = {
   aliases: ["up"],
   description: "\u0639\u0631\u0636 \u062a\u0641\u0627\u0635\u064a\u0644 \u0627\u0644\u0628\u0648\u062a \u0643\u0635\u0648\u0631\u0629.",
   usage: "uptime",
-  category: "General",
+  category: "عام",
 
   async execute({ api, event, commands }) {
     const total  = Math.floor(process.uptime());

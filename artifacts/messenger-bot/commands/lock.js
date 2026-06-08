@@ -3,9 +3,9 @@
 module.exports = {
   name: "lock",
   aliases: ["botlock"],
-  description: "Lock the bot so only admins and moderators can use commands.",
+  description: "قفل البوت بحيث يستخدمه المشرفون فقط.",
   usage: "lock [on|off|status]",
-  category: "Admin",
+  category: "إدارة",
   groupOnly: true,
   adminOnly: true,
 

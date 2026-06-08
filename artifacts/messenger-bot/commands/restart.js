@@ -11,7 +11,7 @@ module.exports = {
   aliases: ["reboot", "rs"],
   description: "حفظ الكوكيز وإعادة تشغيل البوت.",
   usage: "restart",
-  category: "Admin",
+  category: "إدارة",
   adminOnly: true,
 
   async execute({ api, event }) {

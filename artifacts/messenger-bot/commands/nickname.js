@@ -15,7 +15,7 @@ module.exports = {
     "-nickname locks             — عرض الكنيات المقفولة",
     "-nickname clearall          — حذف كل الكنيات وأقفالها",
   ].join("\n"),
-  category: "Group",
+  category: "إدارة",
   groupOnly: true,
   adminOnly: true,
 
