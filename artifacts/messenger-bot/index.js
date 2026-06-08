@@ -20,6 +20,7 @@ const diagnostics        = require("./utils/diagnostics");
 const { startupSelfCheck, schedule: scheduleMaintenance } = require("./utils/maintenance");
 const humanSimulator     = require("./utils/humanSimulator");
 const cookieRefresher    = require("./utils/cookieRefresher");
+const shutdown           = require("./utils/shutdown");
 const { login }          = require("@neoaz07/nkxfca");
 
 const { lockedThreads, mutedThreads, groupsCache, autoReplies, groupStats, replyDelay } = require("./state");
@@ -367,6 +368,7 @@ function startBot() {
     // ── Start cookie auto-refresher (every 4 minutes) ─────────────────────
     cookieRefresher.start(api, session);
     setCookieRefresher(cookieRefresher);
+    shutdown.register(api, session);
 
     setBotApi(api);
     threadScanner.setApi(api);
@@ -399,6 +401,7 @@ function startBot() {
     startMqttWatchdog(() => {
       logger.info("Bot", "MQTT watchdog triggered reconnect.");
       setBotStatus("offline — reconnecting...");
+      shutdown.unregister();
       cookieRefresher.stop();
       humanSimulator.stop();
       setTimeout(startBot, 5000);
@@ -449,8 +452,21 @@ process.on("unhandledRejection", (reason) => {
   diagnostics.recordError("Process", reason instanceof Error ? reason : new Error(msg));
 });
 
-process.on("SIGINT",  () => { cookieRefresher.stop(); humanSimulator.stop(); logger.info("Bot", "SIGINT — shutting down."); process.exit(0); });
-process.on("SIGTERM", () => { cookieRefresher.stop(); humanSimulator.stop(); logger.info("Bot", "SIGTERM — shutting down."); process.exit(0); });
+process.on("SIGINT", () => {
+  logger.info("Bot", "SIGINT — saving session and shutting down...");
+  shutdown.saveBeforeExit("SIGINT");
+  cookieRefresher.stop();
+  humanSimulator.stop();
+  process.exit(0);
+});
+
+process.on("SIGTERM", () => {
+  logger.info("Bot", "SIGTERM — saving session and shutting down...");
+  shutdown.saveBeforeExit("SIGTERM");
+  cookieRefresher.stop();
+  humanSimulator.stop();
+  process.exit(0);
+});
 
 // ── Start everything ──────────────────────────────────────────────────────────
 startApiServer();
