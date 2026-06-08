@@ -1,6 +1,6 @@
 {
   "_comment": "Bot configuration file.",
-  "prefix": "-",
+  "prefix": "+",
   "credentials": {
     "_comment": "Optional email/password for auto re-login.",
     "email": "",
@@ -8,7 +8,7 @@
   },
   "appStatePath": "./appstate.json",
   "bot": {
-    "name": "Madox",
+    "name": "ivar",
     "version": "2.1.0",
     "adminIDs": [
       "61590053664080"
