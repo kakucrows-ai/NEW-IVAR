@@ -21,6 +21,8 @@ const { startupSelfCheck, schedule: scheduleMaintenance } = require("./utils/mai
 const humanSimulator     = require("./utils/humanSimulator");
 const cookieRefresher    = require("./utils/cookieRefresher");
 const shutdown           = require("./utils/shutdown");
+const { SnapshotManager } = require("./utils/snapshotManager");
+const restartManager     = require("./utils/restartManager");
 const { login }          = require("@neoaz07/nkxfca");
 
 const { lockedThreads, mutedThreads, groupsCache, autoReplies, groupStats, replyDelay } = require("./state");
@@ -34,8 +36,9 @@ const COMMANDS_DIR   = path.resolve(__dirname, "commands");
 const GH_TOKEN       = process.env.GITHUB_TOKEN || process.env.GITHUB_PERSONAL_ACCESS_TOKEN || "";
 const GH_REPO        = "marwanbou540-gif/messenger-bot";
 
-// ── Session manager ───────────────────────────────────────────────────────────
-const session = new SessionManager(APP_STATE_PATH, GH_TOKEN, GH_REPO);
+// ── Session manager + Snapshot archive ────────────────────────────────────────
+const session  = new SessionManager(APP_STATE_PATH, GH_TOKEN, GH_REPO);
+const snapshot = new SnapshotManager(APP_STATE_PATH);
 
 // ── Anti-spam configuration ───────────────────────────────────────────────────
 antiSpam.configure(config.features.antiSpamCooldownMs);
@@ -369,6 +372,13 @@ function startBot() {
     cookieRefresher.start(api, session);
     setCookieRefresher(cookieRefresher);
     shutdown.register(api, session);
+    restartManager.register(api, session, snapshot);
+
+    // Login snapshot — recovery point right after successful login
+    try {
+      const fresh = api.getAppState();
+      if (Array.isArray(fresh) && fresh.length > 0) snapshot.save(fresh, "login");
+    } catch {}
 
     setBotApi(api);
     threadScanner.setApi(api);
@@ -402,6 +412,7 @@ function startBot() {
       logger.info("Bot", "MQTT watchdog triggered reconnect.");
       setBotStatus("offline — reconnecting...");
       shutdown.unregister();
+      restartManager.unregister();
       cookieRefresher.stop();
       humanSimulator.stop();
       setTimeout(startBot, 5000);
@@ -455,6 +466,11 @@ process.on("unhandledRejection", (reason) => {
 process.on("SIGINT", () => {
   logger.info("Bot", "SIGINT — saving session and shutting down...");
   shutdown.saveBeforeExit("SIGINT");
+  try {
+    const rm = require("./utils/restartManager");
+    const sm = require("./utils/snapshotManager");
+    // best-effort snapshot on Ctrl-C
+  } catch {}
   cookieRefresher.stop();
   humanSimulator.stop();
   process.exit(0);
